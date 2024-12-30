@@ -49,7 +49,7 @@ class Model:
                 confidence, prediction_index = torch.max(probabilities, dim=1)
 
             # Map prediction index to class
-            classes = ["left-leaning", "center", "right-leaning"]
+            classes = ["Left", "Center", "Right"]
             prediction = classes[prediction_index.item()]
             prediction_values = probabilities.cpu().numpy()
             rounded_prob = np.round(prediction_values, 2)
