@@ -9,7 +9,7 @@ dist/
 wheels/
 *.egg-info
 .python-version
-
+mlruns/
 # Virtual environments
 .venv
 
