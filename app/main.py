@@ -8,12 +8,17 @@ from schema import NewsArticle, PredictionResponse
 from model import Model
 from config import get_config
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from newsapi import NewsApiClient
+from constants import NEWS_SOURCES
+from news_app import get_outlet_news
+
 
 # Load the configuration
-CONFIG = get_config()
-
+config = get_config()
 logger.add("logs/app.log", rotation="1 MB", level="DEBUG")
 logger.info("Starting FastAPI app...")
+
+newsapi = NewsApiClient(api_key=config["NEWS_API_KEY"])
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -44,12 +49,8 @@ async def startup_event():
         )
         tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-        device = torch.device(
-            "cuda"
-            if torch.cuda.is_available()
-            else ("mps" if torch.backends.mps.is_available() else "cpu")
-        )
-        model_path = CONFIG["MODEL_PATH"]
+        device = config["DEVICE"]
+        model_path = config["MODEL_PATH"]
 
         app.state.model = Model(
             model_path=model_path, device=device, model=bert_model, tokenizer=tokenizer
@@ -78,52 +79,27 @@ def predict(article: NewsArticle):
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 
-@app.get("/model/metrics")
-def get_model_metrics():
-    """
-    Retrieve model evaluation metrics logged in MLflow.
-    """
-    try:
-        mlflow.set_tracking_uri(CONFIG["MLFLOW_URI"])
-        mlflow.set_experiment(CONFIG["EXPERIMENT_NAME"])
-
-        client = mlflow.tracking.MlflowClient()
-        experiment = client.get_experiment_by_name(CONFIG["EXPERIMENT_NAME"])
-        if not experiment:
-            raise HTTPException(status_code=404, detail="Experiment not found")
-
-        runs = client.search_runs(
-            experiment.experiment_id,
-            order_by=["attributes.start_time DESC"],
-            max_results=1,
-        )
-        if not runs:
-            raise HTTPException(status_code=404, detail="No runs found in experiment")
-
-        latest_run = runs[0]
-        metrics = latest_run.data.metrics
-
-        return metrics
-    except Exception as e:
-        logger.error(f"Failed to retrieve model metrics: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Failed to retrieve model metrics: {str(e)}"
-        )
+@app.get("/outlets")
+def get_news_outlet():
+    sources = NEWS_SOURCES.keys()
+    return list(sources)
 
 
-@app.get("/health")
-def health_check():
-    """
-    Health check endpoint to verify API status.
-    """
-    return {"status": "healthy"}
+@app.get("/outlets/{outlet}")
+def get_news_details(outlet: str):
+    if outlet in NEWS_SOURCES:
+        outlet = NEWS_SOURCES[outlet]
+    else:
+        raise Exception("No outlets found")
+    response = get_outlet_news(outlet)
+    return response
 
 
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host=CONFIG.get("HOST", "0.0.0.0"),
-        port=CONFIG.get("PORT", 8000),
-        reload=CONFIG.get("RELOAD", False),
-        log_level="debug" if CONFIG.get("DEBUG", False) else "info",
+        host=config.get("HOST", "0.0.0.0"),
+        port=config.get("PORT", 8000),
+        reload=config.get("RELOAD", False),
+        log_level="debug" if config.get("DEBUG", False) else "info",
     )
