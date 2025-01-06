@@ -8,7 +8,6 @@ from schema import NewsArticle, PredictionResponse
 from model import Model
 from config import get_config
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from newsapi import NewsApiClient
 from constants import NEWS_SOURCES
 from news_app import get_outlet_news
 
@@ -18,7 +17,6 @@ config = get_config()
 logger.add("logs/app.log", rotation="1 MB", level="DEBUG")
 logger.info("Starting FastAPI app...")
 
-newsapi = NewsApiClient(api_key=config["NEWS_API_KEY"])
 
 # Initialize FastAPI app
 app = FastAPI(
