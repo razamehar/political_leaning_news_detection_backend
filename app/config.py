@@ -16,12 +16,11 @@ GLOBAL_CONFIG = {
 
 # Environment specific config, or overwrite of GLOBAL_CONFIG
 ENV_CONFIG = {
-    "development": {
+    "DEV": {
         "RELOAD": True,
         "DEBUG": True,
     },
-    "staging": {"RELOAD": False, "DEBUG": True},
-    "production": {
+    "PROD": {
         "RELOAD": False,
         "DEBUG": False,
     },
