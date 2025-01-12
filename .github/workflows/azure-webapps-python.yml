@@ -17,16 +17,21 @@
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
-name: Build and deploy Python app to Azure Web App
+name: Build and Deploy FastAPI App to Azure Web App
 
 env:
-  AZURE_WEBAPP_NAME: your-app-name  # set this to the name of your Azure Web App
-  PYTHON_VERSION: '3.8'              # set this to the Python version to use
+  AZURE_WEBAPP_NAME: political-leaning-news-detection  # Set to your Azure Web App name
+  AZURE_CONTAINER_REGISTRY: political-leaning-news-detection.azurecr.io  # Replace with your ACR name
+  PYTHON_VERSION: '3.11.10'
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches: 
+      - main  # Trigger deployment to production
+  pull_request:
+    branches:
+      - dev   # Trigger workflow for testing on dev branch
+  workflow_dispatch:  # Allow manual triggering of the workflow
 
 permissions:
   contents: read
@@ -36,51 +41,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python version
-        uses: actions/setup-python@v3.0.0
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: Create and start virtual environment
+      - name: Install dependencies with uv
         run: |
-          python -m venv venv
-          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install uv
+          uv --version  # Verify uv installation
+          uv install  # Install dependencies using pyproject.toml
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Run tests with pytest
+        run: |
+          uv add pytest
+          pytest tests/  # Adjust path to your tests folder
 
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v3
-        with:
-          name: python-app
-          path: |
-            .
-            !venv/
+      - name: Build Docker image
+        run: |
+          az acr login --name ${{ env.AZURE_CONTAINER_REGISTRY }}
+          docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}/fastapi-app:latest .
+          docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/fastapi-app:latest
 
   deploy:
     permissions:
       contents: none
     runs-on: ubuntu-latest
     needs: build
-    environment:
-      name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: python-app
-          path: .
-
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: |
+            ${{ env.AZURE_CONTAINER_REGISTRY }}/fastapi-app:latest
