@@ -1,4 +1,4 @@
-import torch
+gimport torch
 import uvicorn
 import mlflow
 from fastapi import FastAPI, HTTPException
