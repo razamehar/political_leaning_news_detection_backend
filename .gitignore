@@ -2,7 +2,6 @@
 __pycache__/
 logs/
 model/
-uv.lock
 *.py[oc]
 build/
 dist/
