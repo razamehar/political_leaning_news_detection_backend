@@ -1,7 +1,6 @@
 # Python-generated files
 __pycache__/
 logs/
-model/
 uv.lock
 *.py[oc]
 build/
@@ -10,6 +9,7 @@ wheels/
 *.egg-info
 .python-version
 mlruns/
+model/
 # Virtual environments
 .venv
 
@@ -23,3 +23,4 @@ mlruns/
 
 .git
 *.log
+data_analysis/
