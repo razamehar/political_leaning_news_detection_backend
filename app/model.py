@@ -47,7 +47,6 @@ class Model:
                 logits = outputs.logits
                 probabilities = F.softmax(logits, dim=1)
                 confidence, prediction_index = torch.max(probabilities, dim=1)
-
             # Map prediction index to class
             classes = ["Left", "Center", "Right"]
             prediction = classes[prediction_index.item()]
