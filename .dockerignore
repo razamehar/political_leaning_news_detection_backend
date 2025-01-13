@@ -8,7 +8,6 @@ wheels/
 *.egg-info
 .python-version
 mlruns/
-models/
 # Virtual environments
 .venv
 

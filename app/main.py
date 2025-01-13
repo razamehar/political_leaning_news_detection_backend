@@ -1,13 +1,25 @@
-gimport torch
+import torch
 import uvicorn
 import mlflow
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import sys
+from pathlib import Path
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+# Get the path to the current file
+current_file = Path(__file__).resolve()
+
+# Get the parent directory (i.e., backend)
+parent_dir = current_file.parent
+
+# Append the 'app' directory to sys.path
+sys.path.append(str(parent_dir))
+
 from logger_config import logger
 from schema import NewsArticle, PredictionResponse
 from model import Model
 from config import get_config
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from peft import LoraConfig
 from constants import NEWS_SOURCES
 from news_app import get_outlet_news
