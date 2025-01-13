@@ -8,7 +8,7 @@ wheels/
 *.egg-info
 .python-version
 mlruns/
-model/
+models/
 # Virtual environments
 .venv
 
@@ -21,5 +21,6 @@ model/
 .DS_Store
 
 .git
+*.ipynb
 *.log
 data_analysis/
