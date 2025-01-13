@@ -5,6 +5,7 @@ from pydantic import BaseModel
 class NewsArticle(BaseModel):
     title: str
     content: str
+    model_name: str
 
 
 class PredictionResponse(BaseModel):

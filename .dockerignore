@@ -1,8 +1,6 @@
 # Python-generated files
 __pycache__/
 logs/
-model/
-uv.lock
 *.py[oc]
 build/
 dist/
@@ -10,6 +8,7 @@ wheels/
 *.egg-info
 .python-version
 mlruns/
+model/
 # Virtual environments
 .venv
 
@@ -19,3 +18,8 @@ mlruns/
 # Ruff cache
 .ruff_cache/
 
+.DS_Store
+
+.git
+*.log
+data_analysis/
