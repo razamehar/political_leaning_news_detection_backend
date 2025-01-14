@@ -23,7 +23,7 @@ class Model:
             if model_config is not None:
                 logger.info("Applying model configuration.")
                 self.model = get_peft_model(self.model, model_config)
-            self.model.load_state_dict(torch.load(self.model_path, map_location=device))
+            self.model.load_state_dict(torch.load(self.model_path, map_location=device, weights_only=True))
             self.model.to(device)
             self.model.eval()
             logger.info("Model loaded successfully from {}", self.model_path)

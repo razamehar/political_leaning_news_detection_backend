@@ -7,6 +7,10 @@ import sys
 from pathlib import Path
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
+# ignore warnings
+import warnings
+warnings.filterwarnings("ignore")
+
 # Get the path to the current file
 current_file = Path(__file__).resolve()
 
