@@ -27,9 +27,20 @@ git clone https://github.com/iampujan/political_leaning_news_detection_backend.g
 cd your-repository
 ```
 
+### Install UV Python package and project manager
+
+#### For macOS and Linux
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+#### For Windows
+```bash
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
 ### Install dependencies
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ### Usage
