@@ -1,8 +1,6 @@
 # Python-generated files
 __pycache__/
 logs/
-model/
-uv.lock
 *.py[oc]
 build/
 dist/
@@ -19,3 +17,9 @@ mlruns/
 # Ruff cache
 .ruff_cache/
 
+.DS_Store
+
+.git
+*.ipynb
+*.log
+data_analysis/
