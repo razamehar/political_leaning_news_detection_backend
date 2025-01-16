@@ -53,9 +53,9 @@ To reproduce the results:
 ## Running the Application
 ### Backend (FastAPI)
 ```bash
-python main.py
+uvicorn app.main:app --host 0.0.0.0 --port 8080
 ```
-The server should start on http://localhost:8000
+The server should start on development: http://localhost:8080 or on production: https://plndapp.gentleground-f2e94450.italynorth.azurecontainerapps.io/ 
 
 ### Frontend (React)
 ```bash
