@@ -1,16 +1,16 @@
 # Political Leaning Detection in News Headlines
 This project aims to analyze political bias in mainstream media by classifying news articles from various outlets as right-leaning, centrist, or left-leaning. The goal is to assess potential biases within these news sources and provide insights into their political orientations. The implementation leverages transformers for sequence classification, alongside tools for preprocessing, training, and evaluating machine learning models.
 
-# Possible Use Cases
-## Helping people understand news bias
+## Possible Use Cases
+### Helping people understand news bias
 - Classifies news articles to show if they lean left, right, or center, and 
 - Aims to help readers make informed choices by identifying bias in news sources
 
-## Supporting NGOs and journalists with media monitoring
+### Supporting NGOs and journalists with media monitoring
 - Monitors bias trends on specific issues, helping ensure balanced reporting
 - Useful for detecting potential misinformation or slanted perspectives
 
-## Assisting academic research
+### Assisting academic research
 - Useful for researchers studying media bias, journalism, or political influence in the news
 
 ## The Dataset
@@ -32,7 +32,7 @@ cd your-repository
 pip install -r requirements.txt
 ```
 
-## Usage
+### Usage
 Run the notebook sequentially in a Jupyter Notebook environment or a similar setup:
 
 - Step 1: Download data using gdown or any alternative method.
@@ -40,7 +40,7 @@ Run the notebook sequentially in a Jupyter Notebook environment or a similar set
 - Step 3: Fine-tune a transformers model using the provided pipeline.
 - Step 4: Evaluate model performance and generate classification reports.
 
-## Reproducibility
+### Reproducibility
 To reproduce the results:
 
 1. Ensure the dependencies are installed as described in the Setup section.
@@ -62,3 +62,7 @@ The server should start on http://localhost:8000
 npm start
 ```
 The server should start on http://localhost:3000 
+
+## Contact
+For any questions or clarifications, please contact Raza Mehar at [raza.mehar@gmail.com], Pujan Thapa at [iampujan@outlook.com] or Syed Najam Mehdi at [najam.electrical.ned@gmail.com].
+
