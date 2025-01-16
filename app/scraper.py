@@ -1,6 +1,6 @@
 import requests
-from bs4 import BeautifulSoup
 from loguru import logger
+from bs4 import BeautifulSoup
 
 # Scrape Web Content
 def scrape_website(url):
