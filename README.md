@@ -56,9 +56,9 @@ To reproduce the results:
 
 1. Ensure the dependencies are installed as described in the Setup section.
 2. Follow the cell execution sequence in the notebook:
-  - Data download and exploration.
-  - Data preprocessing.
-  - Model training and evaluation.
+   - Data download and exploration.
+   - Data preprocessing.
+   - Model training and evaluation.
 3. Save results and logs using mlflow.
 
 ## Running the Application
@@ -66,7 +66,11 @@ To reproduce the results:
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8080
 ```
-The server should start on development: http://localhost:8080 or on production: https://plndapp.gentleground-f2e94450.italynorth.azurecontainerapps.io/ 
+
+The server should start on:
+
+Development: http://localhost:8080
+Production: https://plndapp.gentleground-f2e94450.italynorth.azurecontainerapps.io/
 
 ### Frontend (React)
 ```bash
