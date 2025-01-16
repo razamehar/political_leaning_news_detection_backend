@@ -23,7 +23,7 @@ Follow these steps to set up the project:
 
 ### Clone the repository
 ```bash
-git clone https://github.com/yourusername/your-repository.git
+git clone https://github.com/iampujan/political_leaning_news_detection_backend.git
 cd your-repository
 ```
 
