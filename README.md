@@ -67,10 +67,7 @@ To reproduce the results:
 uvicorn app.main:app --host 0.0.0.0 --port 8080
 ```
 
-The server should start on:
-
-- Development: http://localhost:8080
-- Production: https://plndapp.gentleground-f2e94450.italynorth.azurecontainerapps.io/
+The server should start http://localhost:8080
 
 ### Frontend (React)
 ```bash
