@@ -1,13 +1,30 @@
-gimport torch
+import torch
 import uvicorn
 import mlflow
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import sys
+from pathlib import Path
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+# ignore warnings
+import warnings
+warnings.filterwarnings("ignore")
+
+# Get the path to the current file
+current_file = Path(__file__).resolve()
+
+# Get the parent directory (i.e., backend)
+parent_dir = current_file.parent
+
+# Append the 'app' directory to sys.path
+sys.path.append(str(parent_dir))
+
 from logger_config import logger
 from schema import NewsArticle, PredictionResponse
 from model import Model
 from config import get_config
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from peft import LoraConfig
 from constants import NEWS_SOURCES
 from news_app import get_outlet_news
 
@@ -31,43 +48,64 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+models = {}
+
 @app.on_event("startup")
 async def startup_event():
     """
     Initialize the application and load the model on startup.
     """
-    try:
-        model_name = "bert-base-uncased"
-        logger.info("Loading pre-trained model and tokenizer.")
-        bert_model = AutoModelForSequenceClassification.from_pretrained(
-            model_name, num_labels=3
-        )
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
+    base_model_name = "bert-base-uncased"
+    model_paths = {
+        "model": config["MODEL_PATH"],
+        "quantized_model": config["MODEL_PATH1"],
+        "lora_model": config["MODEL_PATH2"]
+    }
+    logger.info("Loading pre-trained BERT model and tokenizer.")
+    base_model = AutoModelForSequenceClassification.from_pretrained(base_model_name, num_labels=3)
+    tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
-        device = config["DEVICE"]
-        model_path = config["MODEL_PATH"]
+    for model_name, model_path in model_paths.items():
+        try:
+            model_config = None
+            device = config["DEVICE"]
+            
+            if model_name == "lora_model":
+                model_config = LoraConfig(
+                    r=16,
+                    lora_alpha=32,
+                    lora_dropout=0.1,
+                    bias="none"
+                )
+            logger.info(f"Initializing Model wrapper for {model_name} with device: {device} and model path: {model_path}")
+            model_wrapper = Model(model_path=model_path, model=base_model, tokenizer=tokenizer)
+            model_wrapper.load(device=device, model_config=model_config)  # Load the fine-tuned weights
+            
+            # Store the loaded models
+            models[model_name] = (model_wrapper, device, model_config)
+            logger.info(f"{model_name} loaded successfully on startup.")
 
-        logger.info("Initializing Model wrapper with device: {} and model path: {}", device, model_path)
-        app.state.model = Model(
-            model_path=model_path, device=device, model=bert_model, tokenizer=tokenizer
-        )
-        app.state.model.load()
-
-        logger.info("Model loaded successfully on startup.")
-    except Exception as e:
-        logger.exception("Error initializing model: {}", e)
-        raise RuntimeError(f"Error initializing model: {str(e)}")
+        except Exception as e:
+            logger.exception(f"Failed to load {model_name}: {e}")
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(article: NewsArticle):
     """
-    Predict the political leaning of a news article.
+    Predict the political leaning of a news article based on the selected fine-tuned model.
     """
     try:
         logger.info("Received prediction request.")
-        input_data = [f"{article.title} {article.content}"]
+        # Get the selected fine-tuned model from the request
+        selected_model = article.model_name
 
-        prediction, confidence, probabilities = app.state.model.predict(input_data)
+        if selected_model not in models:
+            raise HTTPException(status_code=400, detail="Invalid model name selected.")
+        
+        input_data = [f"{article.title} {article.content}"]
+        device = models[selected_model][1]
+        # Use the selected fine-tuned model for prediction
+        logger.info("Performing prediction using model: {}", selected_model)
+        prediction, confidence, probabilities = models[selected_model][0].predict(input_data, device=models[selected_model][1])
 
         logger.info(
             "Prediction successful: Class - {}, Confidence - {:.2f}",
@@ -75,7 +113,9 @@ def predict(article: NewsArticle):
             confidence,
         )
         return PredictionResponse(
-            prediction=prediction, confidence=confidence, probabilities=probabilities
+            prediction=prediction,
+            confidence=confidence,
+            probabilities=probabilities
         )
     except Exception as e:
         logger.exception("Prediction failed: {}", e)
