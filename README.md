@@ -1,5 +1,5 @@
 # Political Leaning Detection in News Headlines
-This project aims to analyze political bias in mainstream media by classifying news articles from various outlets as right-leaning, centrist, or left-leaning. The goal is to assess potential biases within these news sources and provide insights into their political orientations. The implementation leverages transformers for sequence classification, alongside tools for preprocessing, training, and evaluating machine learning models.
+This project aims to analyze political bias in mainstream media by classifying news articles from various outlets as right-leaning, centrist, or left-leaning. The goal is to assess potential biases within these news sources and provide insights into their political orientations. The implementation leverages transformer for sequence classification, particularly fine-tuning BERT with Low-Rank Adaptation (LoRA). Post-training quantization (PTQ) was used to optimize the model’s performance. 
 
 ## Possible Use Cases
 ### Helping people understand news bias
